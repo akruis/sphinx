@@ -1167,7 +1167,15 @@ class ClassDocumenter(DocstringSignatureMixin, ModuleLevelDocumenter):
                 if content == 'init':
                     docstrings = [initdocstring]
                 else:
-                    docstrings.append(initdocstring)
+                    # Hack: insert the init string into the method string at a given position or not at all
+                    if docstrings:
+                        if ".. noautoinit" not in docstrings[-1]:
+                            classdocstrings = docstrings.pop().split(".. autoinit" ,1)
+                            docstrings.append(classdocstrings.pop(0))
+                            docstrings.append(initdocstring)
+                            docstrings.extend(classdocstrings)
+                    else:
+                        docstrings.append(initdocstring)
         doc = []
         for docstring in docstrings:
             if not isinstance(docstring, text_type):
