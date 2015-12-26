@@ -29,6 +29,8 @@ import codecs
 from jinja2 import FileSystemLoader, TemplateNotFound
 from jinja2.sandbox import SandboxedEnvironment
 
+from six import string_types
+
 from sphinx import package_dir
 from sphinx.ext.autosummary import import_by_name, get_documenter
 from sphinx.jinja2glue import BuiltinTemplateLoader
@@ -155,14 +157,19 @@ def generate_autosummary_docs(sources, output_dir=None, suffix='.rst',
 
             def get_members(obj, typ, include_public=[]):
                 items = []
-                for name in dir(obj):
+                for mname in dir(obj):
                     try:
-                        documenter = get_documenter(safe_getattr(obj, name),
-                                                    obj)
+                        mobj = safe_getattr(obj, mname)
+                        documenter = get_documenter(mobj, obj)
                     except AttributeError:
                         continue
                     if documenter.objtype == typ:
-                        items.append(name)
+                        mdoc = documenter.get_attr(mobj, '__doc__', None)
+                        if isinstance(mdoc, string_types) and ('.. no-autosummary' in mdoc or '.. no-autodoc' in mdoc):
+                            info("[autosummary] ignoring member %s '%s' of '%s'" % (typ, mname, name))
+                            continue
+                        else:
+                            items.append(mname)
                 public = [x for x in items
                           if x in include_public or not x.startswith('_')]
                 return public, items
