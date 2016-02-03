@@ -5,7 +5,7 @@
 
     The CheckExternalLinksBuilder class.
 
-    :copyright: Copyright 2007-2015 by the Sphinx team, see AUTHORS.
+    :copyright: Copyright 2007-2016 by the Sphinx team, see AUTHORS.
     :license: BSD, see LICENSE for details.
 """
 
@@ -95,6 +95,17 @@ def check_anchor(f, hash):
     return parser.found
 
 
+def get_content_charset(f):
+    content_type = f.headers.get('content-type')
+    if content_type:
+        params = (p.strip() for p in content_type.split(';')[1:])
+        for param in params:
+            if param.startswith('charset='):
+                return param[8:]
+
+    return None
+
+
 class CheckExternalLinksBuilder(Builder):
     """
     Checks for broken external links.
@@ -165,6 +176,8 @@ class CheckExternalLinksBuilder(Builder):
                     encoding = 'utf-8'
                     if hasattr(f.headers, 'get_content_charset'):
                         encoding = f.headers.get_content_charset() or encoding
+                    else:
+                        encoding = get_content_charset(f) or encoding
                     found = check_anchor(TextIOWrapper(f, encoding), unquote(hash))
                     f.close()
 
@@ -230,11 +243,12 @@ class CheckExternalLinksBuilder(Builder):
         elif status == 'working':
             self.info(darkgreen('ok        ')  + uri + info)
         elif status == 'broken':
-            self.info(red('broken    ') + uri + red(' - ' + info))
             self.write_entry('broken', docname, lineno, uri + ': ' + info)
-            if self.app.quiet:
+            if self.app.quiet or self.app.warningiserror:
                 self.warn('broken link: %s' % uri,
                           '%s:%s' % (self.env.doc2path(docname), lineno))
+            else:
+                self.info(red('broken    ') + uri + red(' - ' + info))
         elif status == 'redirected':
             text, color = {
                 301: ('permanently', darkred),

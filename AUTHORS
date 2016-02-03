@@ -24,6 +24,7 @@ Other contributors, listed alphabetically, are:
 * Charles Duffy -- original graphviz extension
 * Kevin Dunn -- MathJax extension
 * Josip Dzolonga -- coverage builder
+* Buck Evan -- dummy builder
 * Hernan Grecco -- search improvements
 * Horst Gutmann -- internationalization support
 * Martin Hans -- autodoc improvements
@@ -60,6 +61,7 @@ Other contributors, listed alphabetically, are:
 * Sebastian Wiesner -- image handling, distutils support
 * Michael Wilson -- Intersphinx HTTP basic auth support
 * Joel Wurtz -- cellspanning support in LaTeX
+* Hong Xu -- svg support in imgmath extension and various bug fixes
 
 Many thanks for all contributions!
 

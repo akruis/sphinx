@@ -5,7 +5,7 @@
 
     Test the code-block directive.
 
-    :copyright: Copyright 2007-2015 by the Sphinx team, see AUTHORS.
+    :copyright: Copyright 2007-2016 by the Sphinx team, see AUTHORS.
     :license: BSD, see LICENSE for details.
 """
 
@@ -96,6 +96,30 @@ def test_literal_include_dedent(app, status, warning):
         assert (i, actual) == (i, expect)
 
     assert blocks[5].text == '\n\n'   # dedent: 1000
+
+
+@with_app('xml', testroot='directive-code')
+def test_literal_include_block_start_with_comment_or_brank(app, status, warning):
+    app.builder.build(['python'])
+    et = ElementTree.parse(app.outdir / 'python.xml')
+    secs = et.findall('./section/section')
+    literal_include = secs[0].findall('literal_block')
+    assert len(literal_include) > 0
+    actual = literal_include[0].text
+    expect = (
+        'def block_start_with_comment():\n'
+        '    # Comment\n'
+        '    return 1\n'
+    )
+    assert actual == expect
+
+    actual = literal_include[1].text
+    expect = (
+        'def block_start_with_blank():\n'
+        '\n'
+        '    return 1\n'
+    )
+    assert actual == expect
 
 
 @with_app('html', testroot='directive-code')

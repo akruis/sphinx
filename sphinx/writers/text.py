@@ -5,7 +5,7 @@
 
     Custom docutils writer for plain text.
 
-    :copyright: Copyright 2007-2015 by the Sphinx team, see AUTHORS.
+    :copyright: Copyright 2007-2016 by the Sphinx team, see AUTHORS.
     :license: BSD, see LICENSE for details.
 """
 import os
@@ -860,6 +860,12 @@ class TextTranslator(nodes.NodeVisitor):
     def depart_abbreviation(self, node):
         if node.hasattr('explanation'):
             self.add_text(' (%s)' % node['explanation'])
+
+    def visit_manpage(self, node):
+        return self.visit_literal_emphasis(node)
+
+    def depart_manpage(self, node):
+        return self.depart_literal_emphasis(node)
 
     def visit_title_reference(self, node):
         self.add_text('*')
