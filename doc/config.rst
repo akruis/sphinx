@@ -234,7 +234,7 @@ General configuration
 
    If true, Sphinx will warn about *all* references where the target cannot be
    found.  Default is ``False``.  You can activate this mode temporarily using
-   the :option:`-n` command-line switch.
+   the :option:`-n <sphinx-build -n>` command-line switch.
 
    .. versionadded:: 1.0
 
@@ -453,7 +453,7 @@ documentation on :ref:`intl` for details.
    this path are searched by the standard :mod:`gettext` module.
 
    Internal messages are fetched from a text domain of ``sphinx``; so if you
-   add the directory :file:`./locale` to this settting, the message catalogs
+   add the directory :file:`./locale` to this setting, the message catalogs
    (compiled from ``.po`` format using :program:`msgfmt`) must be in
    :file:`./locale/{language}/LC_MESSAGES/sphinx.mo`.  The text domain of
    individual documents depends on :confval:`gettext_compact`.
@@ -580,7 +580,7 @@ that use Sphinx's HTMLWriter class.
 
    A dictionary of values to pass into the template engine's context for all
    pages.  Single values can also be put in this dictionary using the
-   :option:`-A` command-line option of ``sphinx-build``.
+   :option:`-A <sphinx-build -A>` command-line option of ``sphinx-build``.
 
    .. versionadded:: 0.5
 
@@ -1431,6 +1431,8 @@ These options influence LaTeX output.
         'floated' into the next page but may be preceded by any other text.
         If you don't like this behavior, use 'H' which will disable floating
         and position figures strictly in the order they appear in the source.
+
+        .. versionadded:: 1.3
      ``'footer'``
         Additional footer content (before the indices), default empty.
 

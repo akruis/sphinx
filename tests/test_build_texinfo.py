@@ -23,6 +23,7 @@ from test_build_html import ENV_WARNINGS
 
 
 TEXINFO_WARNINGS = ENV_WARNINGS + """\
+None:None: WARNING: unknown option: &option
 None:None: WARNING: citation not found: missing
 None:None: WARNING: no matching candidate for image URI u'foo.\\*'
 None:None: WARNING: no matching candidate for image URI u'svgimg.\\*'
@@ -58,7 +59,6 @@ def test_texinfo(app, status, warning):
             if retcode != 0:
                 print(stdout)
                 print(stderr)
-                del app.cleanup_trees[:]
                 assert False, 'makeinfo exited with return code %s' % retcode
     finally:
         os.chdir(cwd)
