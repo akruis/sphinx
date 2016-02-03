@@ -5,7 +5,7 @@
 
     The standard domain.
 
-    :copyright: Copyright 2007-2015 by the Sphinx team, see AUTHORS.
+    :copyright: Copyright 2007-2016 by the Sphinx team, see AUTHORS.
     :license: BSD, see LICENSE for details.
 """
 
@@ -628,16 +628,25 @@ class StandardDomain(Domain):
                 return None
 
             if env.config.numfig is False:
-                env.warn(fromdocname, 'numfig is disabled. :numref: is ignored.')
+                env.warn(fromdocname, 'numfig is disabled. :numref: is ignored.',
+                         lineno=node.line)
                 return contnode
 
             try:
                 target_node = env.get_doctree(docname).ids[labelid]
                 figtype = get_figtype(target_node)
+            except:
+                return None
+
+            try:
                 figure_id = target_node['ids'][0]
                 fignumber = env.toc_fignumbers[docname][figtype][figure_id]
             except (KeyError, IndexError):
-                return None
+                # target_node is found, but fignumber is not assigned.
+                # Maybe it is defined in orphaned document.
+                env.warn(fromdocname, "no number is assigned for %s: %s" % (figtype, labelid),
+                         lineno=node.line)
+                return contnode
 
             title = contnode.astext()
             if target == fully_normalize_name(title):
@@ -646,7 +655,8 @@ class StandardDomain(Domain):
             try:
                 newtitle = title % '.'.join(map(str, fignumber))
             except TypeError:
-                env.warn(fromdocname, 'invalid numfig_format: %s' % title)
+                env.warn(fromdocname, 'invalid numfig_format: %s' % title,
+                         lineno=node.line)
                 return None
 
             return self.build_reference_node(fromdocname, builder,

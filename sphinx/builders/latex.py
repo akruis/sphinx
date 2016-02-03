@@ -5,7 +5,7 @@
 
     LaTeX builder.
 
-    :copyright: Copyright 2007-2015 by the Sphinx team, see AUTHORS.
+    :copyright: Copyright 2007-2016 by the Sphinx team, see AUTHORS.
     :license: BSD, see LICENSE for details.
 """
 
@@ -97,8 +97,8 @@ class LaTeXBuilder(Builder):
             self.info("processing " + targetname + "... ", nonl=1)
             toctrees = self.env.get_doctree(docname).traverse(addnodes.toctree)
             if toctrees:
-                if toctrees[0].get('maxdepth'):
-                    tocdepth = int(toctrees[0].get('maxdepth'))
+                if toctrees[0].get('maxdepth') > 0:
+                    tocdepth = toctrees[0].get('maxdepth')
                 else:
                     tocdepth = None
             else:

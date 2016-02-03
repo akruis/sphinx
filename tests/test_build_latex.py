@@ -5,7 +5,7 @@
 
     Test the build process with LaTeX builder with the test root.
 
-    :copyright: Copyright 2007-2015 by the Sphinx team, see AUTHORS.
+    :copyright: Copyright 2007-2016 by the Sphinx team, see AUTHORS.
     :license: BSD, see LICENSE for details.
 """
 from __future__ import print_function
@@ -24,18 +24,17 @@ from test_build_html import ENV_WARNINGS
 
 
 LATEX_WARNINGS = ENV_WARNINGS + """\
-None:None: WARNING: unknown option: &option
-None:None: WARNING: citation not found: missing
-None:None: WARNING: no matching candidate for image URI u'foo.\\*'
-WARNING: invalid pair index entry u''
-WARNING: invalid pair index entry u'keyword; '
+%(root)s/markup.txt:158: WARNING: unknown option: &option
+%(root)s/footnote.txt:60: WARNING: citation not found: missing
+%(root)s/images.txt:20: WARNING: no matching candidate for image URI u'foo.\\*'
+%(root)s/markup.txt:269: WARNING: Could not parse literal_block as "c". highlighting skipped.
 """
 
 if PY3:
     LATEX_WARNINGS = remove_unicode_literals(LATEX_WARNINGS)
 
 
-@with_app(buildername='latex')
+@with_app(buildername='latex', freshenv=True)  # use freshenv to check warnings
 def test_latex(app, status, warning):
     LaTeXTranslator.ignore_missing_images = True
     app.builder.build_all()
@@ -94,7 +93,7 @@ def test_latex(app, status, warning):
         os.chdir(cwd)
 
 
-@with_app(buildername='latex',
+@with_app(buildername='latex', freshenv=True,  # use freshenv to check warnings
           confoverrides={'latex_documents': [
               ('contents', 'SphinxTests.tex', 'Sphinx Tests Documentation',
                'Georg Brandl \\and someone else', 'howto'),
@@ -475,3 +474,25 @@ def test_toctree_maxdepth_howto(app, status, warning):
     print(status.getvalue())
     print(warning.getvalue())
     assert '\\setcounter{tocdepth}{2}' in result
+
+
+@with_app(buildername='latex', testroot='toctree-maxdepth',
+          confoverrides={'master_doc': 'foo'})
+def test_toctree_not_found(app, status, warning):
+    app.builder.build_all()
+    result = (app.outdir / 'Python.tex').text(encoding='utf8')
+    print(result)
+    print(status.getvalue())
+    print(warning.getvalue())
+    assert '\\setcounter{tocdepth}' not in result
+
+
+@with_app(buildername='latex', testroot='toctree-maxdepth',
+          confoverrides={'master_doc': 'bar'})
+def test_toctree_without_maxdepth(app, status, warning):
+    app.builder.build_all()
+    result = (app.outdir / 'Python.tex').text(encoding='utf8')
+    print(result)
+    print(status.getvalue())
+    print(warning.getvalue())
+    assert '\\setcounter{tocdepth}' not in result
