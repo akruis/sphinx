@@ -677,6 +677,16 @@ class Documenter(object):
                 # ignore undocumented members if :undoc-members: is not given
                 keep = has_doc or self.options.undoc_members
 
+            # exclude members that have the magic comment ".. no-autodoc" in
+            # their documentation
+            if doc is not None and ".. no-autodoc" in doc:
+                keep = False
+            else:
+                for line in attr_docs.get((namespace, membername), ()):
+                    if ".. no-autodoc" in line:
+                        keep = False
+                        break
+
             # give the user a chance to decide whether this member
             # should be skipped
             if self.env.app:
